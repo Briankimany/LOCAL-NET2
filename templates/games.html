@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home Page</title>
+  <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style2.css') }}">
+
+  <style>
+    /* Base styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #444040;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+
+    nav {
+      color:  blue;
+      background-color: #b19b9b;
+    }
+    /* Responsive tiling (adjust grid-template-columns as needed) */
+    @media (min-width: 768px) {
+      .pdf-container-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-gap: 20px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+    }
+    @media (max-width: 767px) {
+      .pdf-container-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 10px;
+      }
+      .pdf-container {
+        width: 100%;  /* Adjust width for single column on smaller screens */
+        margin: 10px 0;
+      }
+    }
+
+    /* Styles for individual PDF containers */
+    .pdf-container {
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      text-align: center;
+    }
+    .pdf-container a {
+      text-decoration: none;
+      color: #333;
+    }
+    .pdf-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .pdf-container p {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    /* Navigation and AI content styling */
+    header {
+      background-color: #eee;
+      padding: 10px 20px;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #ai-content {
+      padding: 20px;
+      border-top: 1px solid #ddd;
+    }
+    #ai-content h3 {
+      margin-bottom: 10px;
+    }
+  </style>
+
+</head>
+<body>
+  <header>
+    <nav>
+      <!-- <menu> -->
+        <h1>
+          <a href="/home">Home</a>
+        </h1>
+        <h1>
+          <a href="/games">GAMES</a>
+        </h1>
+        <h1>
+          <a href="/download">FREE  DOWNLOAD</a>
+        </h1>
+        <h1>
+          <a href="/stream">STREAM</a>
+        </h1>
+        <h1>
+          <a href="/series">SERIES</a>
+        </h1>
+
+      <!-- </menu> -->
+    </nav>
+  </header>
+  <div class="container-grid">
+    {% for game_id ,game_name , game_src in content %}
+      <div class="container">
+        <a href="specific_games/{{ game_id | escape }}">
+          <img src="image/{{ game_id }}" alt="{{game_name }}">
+        </a>
+        <p>{{ game_name}}</p>
+      </div>
+    {% endfor %}
+  </div>
+  </body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Page</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style2.css') }}">
+
+  <style>
+
+    /* Global Styles */
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #d4d4d4;
+        color: #fff;
+      }
+      
+      h1, h2 {
+        text-align: center;
+        color: rgb(64, 7, 156);
+      }
+      
+      h1 {
+        font-size: 26px;
+        margin-bottom: 1px;
+      }
+      
+      h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      
+      /* Navigation Styles */
+      
+      header {
+        width: 100%;
+        background-color: rgb(202, 190, 184);
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: space-between;
+      }
+      
+      nav li {
+        margin-right: 20px;
+      }
+      
+      nav a {
+        text-decoration: none;
+        color: #333;
+        transition: color 0.2s ease-in-out;
+      }
+      
+      nav a:hover{
+        color: rgb(64, 7, 156);
+      }
+      
+      /* Hero Section Styles */
+      
+    .hero {
+        background-color: #eee;
+        padding: 2px 2px;
+        text-align: center;
+      }
+      
+      /* Media Section Styles */
+      
+    .media {
+        background-color: #ddd2d2;
+        padding: 1px 2px;
+      }
+      
+    .media-parent {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+    .media-child {
+        width: 70%;
+        margin: 0 auto;
+        align-self: auto;
+        align-items: center;
+      }
+      
+
+    .video-js {
+        margin: 0 auto;
+        background-color: #181212;
+        }
+            
+
+    .container {
+        background-color: #181212;
+        padding: 10px;
+        text-align: center;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(218, 210, 210, 0.1);
+      }
+      
+    .container img {
+        width: 244px;
+        height: 244px;
+        border-radius: 10px;
+      }
+      
+    .container p {
+        margin-top: 10px;
+        color: #fff;
+      }
+      
+      /* Footer Styles */
+      
+      footer {
+        background-color: #eee;
+        padding: 20px 20px;
+        text-align: center;
+      }
+      
+      /* Media Queries */
+      
+    @media (min-width: 768px) {
+	/* New code for 2x3 grid layout */
+	.container-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		grid-template-rows: repeat(3, 1fr);
+		gap: 10px; /* Adjust spacing between items (optional) */
+		padding: 20px;  /* Add padding to the container */
+		margin: 0 auto;  /* Center the container horizontally */
+		max-width: 1080px; /* Set a maximum width for the container (optional) */
+	}
+
+	}
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="/home">Home</a></li>
+        <li><a href="/games">GAMES</a></li>
+        <li><a href="/cart">cart</a></li>
+        <li><a href="/stream">STREAM</a></li>
+        <li><a href="/series">SERIES</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>WELOCOME TO YOU LOCALINTERNET</h1>
+    </section>
+
+    <section class="media">
+      <div class="media-parent">
+        <div class="media-child">
+          <video id="player_one" class="video-js vjs-fluid" controls preload playsinline poster="../examples/assets/images/poster.jpg" controlsList="nodownload"> 
+            <source src={{video_link}} type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="container-grid">
+        {% for content_id,content_name, image_path in content %}
+          <div class="container">
+            <a href="/specific_series/{{ content_id | escape }}">
+              <img src="image/{{ content_id }}" alt="{{ content_name }}">
+            </a>
+            <button><a href="/buy/{{content_id}}" BUY>BUY</a>></a></button>
+            <p>{{ content_name }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+  <footer>
+    <!-- footer content -->
+  </footer>
+
+  <script src="{{ url_for('static', filename='video.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='nuevo.min.js') }}"></script>
+  <script>
+    var player = videojs('player_one');
+    player.nuevo({ 
+        title: "Nuevo plugin for VideoJs Player",
+        url: "https://www.nuevodevel.com/nuevo",    
+    });
+  </script>
+</body>
+</html>

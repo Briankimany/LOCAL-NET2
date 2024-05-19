@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Watch List</title>
+	<style>
+		/* Add some basic styling to make the page look decent */
+		body {
+			font-family: Arial, sans-serif;
+			margin: 20px;
+		}
+		.container-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 20px;
+		}
+		.container {
+			background-color: #f9f9f9;
+			padding: 20px;
+			border: 1px solid #ccc;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		}
+		img {
+			width: 100%;
+			height: 150px;
+			object-fit: cover;
+			margin-bottom: 10px;
+		}
+	</style>
+</head>
+<body>
+	<h1>SERIES</h1>
+	<div class="container-grid">
+		{% for series_id, series_name, series_profile in series %}
+			<div class="container">
+				<a href="/specific_series/{{ series_id| escape }}">
+					<img src="image/{{ series_id }}" alt="{{ series_name }}">
+				</a>
+				<p>{{ series_name }}</p>
+			</div>
+		{% endfor %}
+	</div>
+	<h1>MOVIES</h1>
+	<div class="container-grid">
+		{% for movie_id, movie_name, movies_profile in movies %}
+			<div class="container">
+				<a href="/stream_video/{{ movie_id }}"> <img src="image/{{ movie_id }}" alt="{{ movie_name }}"></a>
+				<p>{{ movie_name }}</p>
+				<button>
+					<a href="/download/{{ movie_id }}" download>Download</a>
+				</button>
+			</div>
+		{% endfor %}
+	</div>
+</body>
+</html>

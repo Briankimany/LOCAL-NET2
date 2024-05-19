@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info Form</title>
+    <title>{{content_name}}</title>
+</head>
+<body>
+    <h1>User Information Form</h1>
+    <form action="/g_download/{{content_id}}" method="post">
+
+        <label for="choice">Choose an option:</label><br>
+        <input type="radio" id="download" name="option" value="download">
+        <label for="download">Download from the internet</label><br>
+        <input type="radio" id="local" name="option" value="local">
+        <label for="local">Visit local installer</label><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

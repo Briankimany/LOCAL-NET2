@@ -1,0 +1,45 @@
+/* Basic styles */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Header styles */
+  .header {
+    background-color: #f0f0f0;
+    text-align: center;
+  }
+  
+  .header h1 {
+    font-size: 2em;
+    margin-bottom: 0;
+  }
+  
+  /* Main content styles */
+  .main {
+    padding-top: 40px;
+  }
+  
+  .media-wrapper {  position: relative;
+    margin-bottom: 40px;  /* Added margin for spacing */
+  }
+  
+  .video-js {
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Footer styles (customize as needed) */
+  .footer {
+    background-color: #f0f0f0;
+    text-align: center;
+    padding: 10px 0;
+  }
+  

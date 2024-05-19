@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Download Page</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style2.css') }}">
+  <style>
+    /* Base styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #292424;
+    }
+    nav { 
+        color: rgb(9, 5, 29);
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        background-color: rgb(188, 191, 199);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: rgb(64, 7, 156);
+    }
+
+    /* Responsive tiling (adjust grid-template-columns as needed) */
+    @media (min-width: 768px) {
+      /* New code for 2x3 grid layout */
+      .container-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 20px; /* Adjust spacing between items (optional) */
+        padding: 20px;  /* Add padding to the container */
+        margin: 0 auto;  /* Center the container horizontally */
+        max-width: 800px; /* Set a maximum width for the container (optional) */
+      }
+
+    }
+    @media (max-width: 767px) {
+      .container-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 10px;
+      }
+      .pdf-container {
+        width: 100%;  /* Adjust width for single column on smaller screens */
+        margin: 10px 0;
+      }
+    }
+
+    p {
+      color: rgb(241, 228, 228);
+    }
+
+    /* Styles for individual PDF containers */
+    .container {
+      background-color: #682424;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      text-align: center;
+    }
+    .container a {
+      text-decoration: none;
+      color: #333;
+    }
+    .container img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .container p {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    /* Navigation and AI content styling */
+    header {
+      background-color: #eee;
+      padding: 10px 20px;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #ai-content {
+      padding: 20px;
+      border-top: 1px solid #ddd;
+    }
+    #ai-content h3 {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <h1>WELOCOME TO YOU LOCAL INTERNET</h1>
+      <h2>{{ time_now }}</h2>
+    </nav>
+  </header>
+  
+  <nav>
+    <!-- <menu> -->
+      <h1>
+        <a href="/home">Home</a> 
+      </h1>
+      <h1>
+        <a href="/games">GAMES</a> 
+      </h1>
+      <h1>
+        <a href="/cart">FREE DOWNLOAD</a> 
+      </h1>
+      <h1>
+        <a href="/stream">STREAM</a>
+      </h1>
+      <h1>
+        <a href="/series">SERIES</a>
+      </h1>
+     
+    <!-- </menu> -->
+  </nav>
+  <h1>
+    SERIES
+  </h1>
+  <div class="container-grid">
+    {% for series_id ,series_name, series_profile in series %}
+      <div class="container">
+        <!-- <h1>{{series_id}}</h1> -->
+        <a href="/specific_series/{{series_id| escape }}">  <img src="image/{{ series_id }}" alt="{{series_name }}"> </a>
+        <p>{{ series_name }}</p>
+      <button><a href="/buy/{{series_name}}" BUY>BUY</a>></a></button>
+    </div>
+    {% endfor %}
+  </div>
+  <h1>
+    MOVIES
+  </h1>
+  <div class="container-grid">
+    {% for movie_id , movie_name  , movies_profile in movies %}
+      <div class="container">
+        <!-- <h1>{{series_id}}</h1> -->
+        <a href="/stream_video/{{ movie_id }}"> <img src="image/{{ movie_id }}" alt="{{ movie_name }}"></a>
+        <p>{{ movie_name }}</p>
+        <button>
+          <a href="/download/{{ movie_id}}" download>Download</a>
+        </button>
+        <button><a href="/buy/{{movie_id}}" BUY>BUY</a>></a></button>
+      </div>
+    {% endfor %}
+  </div>
+  
+  </body>
+</html>
