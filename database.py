@@ -115,6 +115,7 @@ class DatabaseManager:
         data_base_design = self.create_data_base_design(default_state=self.default_design)
         save_load_program_data(path=self.data_base_json_design , data=data_base_design , mode='w')
         for _ , path in data_base_design.items():
+            print("Evaluating tis" , path)
             path = Path(path)
             if path.exists():
                 continue
@@ -155,7 +156,7 @@ class DataBaseIndex:
     def __init__(self , db_path) -> None:
         self.root_dir = Path(db_path).absolute()
         self.db = sqlite3.connect(self.root_dir)
-        # print(t.execute(f"SELECT category FROM FULL_TABLE WHERE content_id = '{name}'").fetchone() )
+
 
 
     def log(self , query:str):
@@ -283,7 +284,10 @@ class DataBaseIndex:
         returns content type eg MOVIES , SERIES , GAMES ...
         """
         cursor = sqlite3.connect(self.root_dir).cursor()
-        content_type = cursor.execute(f"SELECT category FROM FULL_TABLE WHERE content_id = {content_id}").fetchone()[0]
+        content_type = cursor.execute(f"SELECT category FROM FULL_TABLE WHERE content_id = {content_id}").fetchone()
+
+        if content_type:
+            content_type = content_type[0]
         return content_type
 
     def determine_if_downloadable(self , content_id):
@@ -453,18 +457,21 @@ class DataBaseIndex:
             return list(map(self.grab_universally , name))
         return self.grab_universally(name)
 
-
+from config import CONTENT_LOCATION , DATABASE_LOCATION , USER_DB_LOCATION
 
 if __name__ == "__main__":
-    # database_path = "/home/Kimany/playpit/content2"
-    # database = DatabaseManager(data_base_path=database_path)
-    # db_connection = sqlite3.connect("/home/Kimany/playpit/content2/databasev1.db")
+    database_path = CONTENT_LOCATION
+    database = DatabaseManager(data_base_path=database_path)
+
+    database.format_images()
+    database.generate_db_jsons()
+    database.update_db_file()
+
+    # db_connection = sqlite3.connect(DATABASE_LOCATION)
     # # clean_db(db_connection=db_connection)
-    # database.format_images()
-    # database.generate_db_jsons()
-    # database.update_db_file(json_source="/home/Kimany/playpit/content2")
-    view_all_tables_and_content("/home/Kimany/content2/databasev1.db")
-    db = DataBaseIndex("/home/Kimany/content2/databasev1.db")
+
+    # view_all_tables_and_content(DATABASE_LOCATION)
+    db = DataBaseIndex(DATABASE_LOCATION)
     print(db[1])
 
 

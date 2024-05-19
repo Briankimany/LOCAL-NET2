@@ -22,13 +22,46 @@ def get_files_patterns(source_dir , file_types):
     - The first list contains paths to all content profile files (`.png`, `.jpg`, `.jpeg`).
     - The second list contains paths to all other content files with extensions specified in `file_types`.
     """
+    # content_profile = list(source_dir.glob("*.png")) + list(source_dir.glob("*.jpg")) + list(source_dir.glob("*.jpeg"))
+    # content_files =[]
+    # for file_type in file_types:
+    #     data = source_dir.glob(f"*{file_type}")
+    #     content_files.extend(data)
+
+    # return content_files , content_profile
+
+    source_dir = source_dir if isinstance(source_dir , Path) else Path(source_dir)
     content_profile = list(source_dir.glob("*.png")) + list(source_dir.glob("*.jpg")) + list(source_dir.glob("*.jpeg"))
+    print("\n")
+    directories = os.listdir(source_dir)
+
+    for m in content_profile:
+        m = Path(m).with_suffix(".jpg")
     content_files =[]
     for file_type in file_types:
         data = source_dir.glob(f"*{file_type}")
         content_files.extend(data)
 
+    ruler = content_files
+    follow = content_profile
+
+    if len (content_profile) >  len(content_files):
+        ruler = content_profile
+        follow = content_files
+
+    elif len(content_files) == len(content_profile):
+        pass
+
+    result_dict = {}
+
+    if len(content_files) == 0:
+        follow =[(Path(i).with_suffix(".zip")).absolute() for i in ruler]
+        content_files = [(Path(i).with_suffix(".zip")).absolute() for i in content_profile]
+
     return content_files , content_profile
+
+
+
 
 
 def determine_ruler_follower_save_recurse( directory ,content_files, content_profile ):
@@ -53,6 +86,7 @@ def determine_ruler_follower_save_recurse( directory ,content_files, content_pro
 
     The function returns a tuple containing `ruler`, `follow`, `recurse`, and `save` flags.
     """
+
     recurse = False
     save = True
     ruler = content_files
@@ -119,21 +153,21 @@ def save_data_base_json(result_dict  , source_dir , debuging , tracker_name = "t
 
     dict_path = source_dir / tracker_name
     if debuging:
-        debuging_name = f"test.json"
+        debuging_name = "test.json"
         save_load_program_data(path=(source_dir/debuging_name) , data= convert_dict(result_dict.copy() , to_string=True) , mode='w')
 
-    if dict_path.is_file() and 4==7:
-        present_dict = save_load_program_data(path=dict_path)
-        present_dict = convert_dict(present_dict)
-        if get_max_dict(present_dict , result_dict):
-            present_dict.update(result_dict)
-            final_d = present_dict
-        else:
-            result_dict.update(present_dict)
-            final_d = result_dict
+    # if dict_path.is_file() and 4==7:
+    #     present_dict = save_load_program_data(path=dict_path)
+    #     present_dict = convert_dict(present_dict)
+    #     if get_max_dict(present_dict , result_dict):
+    #         present_dict.update(result_dict)
+    #         final_d = present_dict
+    #     else:
+    #         result_dict.update(present_dict)
+    #         final_d = result_dict
 
-    else:
-        final_d = result_dict
+    # else:
+    final_d = result_dict
     save_load_program_data(path=dict_path , data = convert_dict(final_d ,to_string=True) , mode = "w")
 
 
@@ -151,15 +185,15 @@ def prepare_data_base_jsons(directory , file_types = [".mp4"] , debuging = False
 
     """
     source_dir = directory if isinstance(directory , Path) else Path(directory)
-
+    print("getinf info from ", directory , file_types)
     content_files , content_profile = get_files_patterns(source_dir=source_dir , file_types = file_types)
-
+    print("here sre the content and content profilr", content_files , content_profile)
     ruler , follow , recurse , save    = determine_ruler_follower_save_recurse( directory= source_dir,
                                                                                content_files=content_files ,
                                                                                content_profile=content_profile)
 
     result_dict = compare(ruler=ruler , follow=follow)
-    # print(result_dict)
+    print("here is result dit",result_dict , "from this dir" , directory)
     dict_name ="tracker.json"
     if recurse:
         dict_name = "redirect.json"

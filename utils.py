@@ -207,16 +207,6 @@ def get_dir_content(directory , file_types = [".mp4"] , debuging = False , get_i
 
 
 if __name__ =="__main__":
-    directory = "/home/Kimany/playpit/content2/GAMES"
-    path = get_dir_content(directory , file_types = [".zip"] , debuging = True , get_intermideary = False)
-
-
-
-
-
-
-
-
-
-
-
+    # directory = "/home/Kimany/playpit/content2/GAMES"
+    # path = get_dir_content(directory , file_types = [".zip"] , debuging = True , get_intermideary = False)
+    pass

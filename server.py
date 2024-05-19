@@ -13,15 +13,20 @@ from database import DataBaseIndex
 from users import Users
 import logging
 
+
+from config import CONTENT_LOCATION , DATABASE_LOCATION , USER_DB_LOCATION
+
+
+
 app = Flask(__name__)
 
-users_db = Users("/home/Kimany/content2")
+users_db = Users(CONTENT_LOCATION)
 
 with open("savauianna" , 'w') as f:
     f.write("loaded user db without issues")
 
 app.secret_key='KIMANI'
-db_indexer = DataBaseIndex(db_path="/home/Kimany/content2/databasev1.db")
+db_indexer = DataBaseIndex(db_path=DATABASE_LOCATION)
 
 app.logger.setLevel(logging.DEBUG)  # Set the logging level (DEBUG, INFO, etc.)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -259,22 +264,22 @@ def get_examples():
 
 @app.route("/specific_games/<game_id>")
 def view_specific_game(game_id):
-
-    with open("ccclogs" , 'w+') as file:
-        file.write(game_name)
-    try:
-        game_name = (db_indexer[game_id])[1]
-        return render_template("save_game.html" ,content_id = game_id , content_name =  game_name )
-    except Exception as e:
-        with open   ("ccclogs" , 'w+') as file:
-            file.write(str(e))
-        return str(e)
+    game_name = (db_indexer[game_id])[0][1]
+    return render_template("save_game.html" ,content_id = game_id , content_name =  game_name )
 
 
 
-@app.route("/g_download/<game_id>")
+
+
+@app.route("/g_download/<game_id>" ,  methods=['POST'])
 # @true_login_required
 def get_game(game_id):
+    option = request.form.get('option' , 'local')
+    if option =='download':
+        # return redirect(")
+        pass
+    elif option == 'loca':
+        pass
     game_path = Path(db_indexer.get_full_path(game_id))
     return send_from_directory(game_path.parent , game_path.name)
 
