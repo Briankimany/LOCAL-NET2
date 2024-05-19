@@ -16,6 +16,10 @@ import logging
 app = Flask(__name__)
 
 users_db = Users("/home/Kimany/content2")
+
+with open("savauianna" , 'w') as f:
+    f.write("loaded user db without issues")
+
 app.secret_key='KIMANI'
 db_indexer = DataBaseIndex(db_path="/home/Kimany/content2/databasev1.db")
 
@@ -258,7 +262,7 @@ def view_specific_game(game_id):
 
     with open("ccclogs" , 'w+') as file:
         file.write(game_name)
-    try
+    try:
         game_name = (db_indexer[game_id])[1]
         return render_template("save_game.html" ,content_id = game_id , content_name =  game_name )
     except Exception as e:
