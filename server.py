@@ -310,6 +310,7 @@ def series_list(series_id):
 @app.route("/stream_video_premium/image/<content_id>")
 @app.route("/specific_series/image/<content_id>")
 @app.route("/stream_video/image/<content_id>")
+@app.route("/g_download/image/<content_id>")
 def re_route_image(content_id):
     return redirect   (url_for(f"get_image" , filename = content_id))
 

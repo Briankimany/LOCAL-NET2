@@ -3,21 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Info Form</title>
-    <title>{{content_name}}</title>
+    <title>{{ content_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style2.css') }}">
+    <h1>{{ content_name }}</h1>
+    <style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    .image-container {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .form-container {
+        padding: 20px;
+        background-color: #f0f0f0;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    label, input[type="radio"], input[type="submit"] {
+        margin: 10px 0;
+    }
+
+    </style>
+
+
 </head>
 <body>
-    <h1>User Information Form</h1>
-    <form action="/g_download/{{content_id}}" method="post">
-
-        <label for="choice">Choose an option:</label><br>
-        <input type="radio" id="download" name="option" value="download">
-        <label for="download">Download from the internet</label><br>
-        <input type="radio" id="local" name="option" value="local">
-        <label for="local">Visit local installer</label><br><br>
-
-        <input type="submit" value="Submit">
-    </form>
+    <div class="container">
+        <div class="image-container">
+            <img src="/image/{{content_id}}" alt="Top Image">
+        </div>
+        <form action="/g_download/{{ content_id }}" method="post">
+            <label for="choice">Choose an option:</label><br>
+            <input type="radio" id="download" name="option" value="download">
+            <label for="download">Download from the internet</label><br>
+            <input type="radio" id="local" name="option" value="local">
+            <label for="local">Visit local installer</label><br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
 </body>
 </html>

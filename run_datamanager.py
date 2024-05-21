@@ -6,7 +6,7 @@ import sqlite3
 from config import CONTENT_LOCATION , DATABASE_LOCATION , USER_DB_LOCATION
 
 
-database_path = "content2"
+database_path = DATABASE_LOCATION
 database = DatabaseManager(data_base_path=CONTENT_LOCATION)
 db_connection = sqlite3.connect(DATABASE_LOCATION)
 # clean_db(db_connection=db_connection)
