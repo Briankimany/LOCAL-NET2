@@ -1,6 +1,6 @@
 
 from flask import Flask
-from flask import  redirect, url_for , render_template , send_from_directory , make_response , request  , current_app , send_file , session
+from flask import  redirect, url_for , render_template , send_from_directory , make_response , request  , current_app , send_file , session , render_template_string
 import re
 import os
 import time
@@ -8,22 +8,20 @@ from pathlib import Path
 from utils import save_load_program_data
 from functools import wraps
 
-import ssl
+
 from database import DataBaseIndex
 from users import Users
 import logging
 
 
-from config import CONTENT_LOCATION , DATABASE_LOCATION , USER_DB_LOCATION
+from config import CONTENT_LOCATION , DATABASE_LOCATION , USER_DB_LOCATION , UPLOAD_DIR
+from pathlib import Path
 
-
-
-app = Flask(__name__)
 
 users_db = Users(CONTENT_LOCATION)
+app = Flask(__name__)
+app.config['STATIC_FOLDER'] = os.path.abspath('templates/static')
 
-with open("savauianna" , 'w') as f:
-    f.write("loaded user db without issues")
 
 app.secret_key='KIMANI'
 db_indexer = DataBaseIndex(db_path=DATABASE_LOCATION)
@@ -35,14 +33,30 @@ handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 
 
+
+
+
+# def login_required(func):
+#     @wraps(func)
+#     def decorated_function(*args, **kwargs):
+#         # print("calling the decorated funtion")
+#         if 'user' not in session:
+#         if 'user' not in session or session['user'].lowwer() != 'Ajay':
+#             return redirect(url_for('get_examples'))
+#         return func(*args, **kwargs)
+#     return decorated_function
+
+
 def login_required(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         # print("calling the decorated funtion")
-        if 'user' not in session or session['user'].lowwer() != 'Ajay':
-            return redirect(url_for('get_examples'))
+        if 'user' not in session:
+            return redirect(url_for('login'))
         return func(*args, **kwargs)
     return decorated_function
+
+
 
 
 
@@ -57,8 +71,6 @@ def true_login_required(func):
 
 
 
-
-app.config['STATIC_FOLDER'] = os.path.abspath('templates/static')
 def get_time():
     current_time = time.localtime()
     formated_time = time.strftime("%Y/%b/%d  %H:%M" , current_time)
@@ -67,6 +79,8 @@ def get_time():
 
 @app.route("/")
 def login():
+
+    return redirect(url_for('get_examples'))
     return render_template("login.html")
 
 
@@ -345,4 +359,62 @@ def buy_s(content_id):
                 users_db.update_consumer_table(user_id=user_id , content_id=item[0])
 
     return redirect(url_for(f"cart" , userid = user_id))
+
+
+@app.route("/up")
+def up():
+   return render_template("upload.html")
+@app.route("/upload" , methods = ['POST'])
+def upload():
+
+    file = request.files['file']
+    file_path = Path(UPLOAD_DIR) / file.filename
+
+    file.save(str(file_path))
+
+    return render_template("upload.html")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
