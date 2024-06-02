@@ -8,6 +8,19 @@ import sqlite3
 import os
 
 
+
+def determine_content_type(content_path):
+    categories = ['GAMES' , 'MOVIES' , 'STREAM' , 'SERIES']
+
+    if categories[2] in content_path:
+            return categories[2]
+
+    for category in categories:
+        if category in content_path and categories[2] not in content_path:
+            return category
+
+
+
 def get_files_patterns(source_dir , file_types):
     """
     This function takes a source directory path (`source_dir`) and a list of file extensions (`file_types`) as input.
@@ -59,9 +72,6 @@ def get_files_patterns(source_dir , file_types):
         content_files = [(Path(i).with_suffix(".zip")).absolute() for i in content_profile]
 
     return content_files , content_profile
-
-
-
 
 
 def determine_ruler_follower_save_recurse( directory ,content_files, content_profile ):
@@ -416,6 +426,8 @@ def update_db(db_conection:sqlite3.connect,  tracker_jsons ):
                     name = str(Path(content_data).stem )+ "_WAITING"
 
                 category = content_data.split(os.sep)[1]
+                category = determine_content_type(content_data)
+                print(f"Here is the content data {content_data} , {content_data.split(os.sep)}")
                 downloadable = True
                 if category == "STREAM":
                     downloadable = False
@@ -449,4 +461,17 @@ def update_db(db_conection:sqlite3.connect,  tracker_jsons ):
                       name=name , category=category ,
                       downloadable=downloadable,
                       destination=destination,image_src=image_src)
+
+
+
+
+
+
+
+
+
+
+
+
+
 

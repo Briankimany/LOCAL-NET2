@@ -9,10 +9,10 @@ from config import CONTENT_LOCATION , DATABASE_LOCATION , USER_DB_LOCATION
 database_path = DATABASE_LOCATION
 database = DatabaseManager(data_base_path=CONTENT_LOCATION)
 db_connection = sqlite3.connect(DATABASE_LOCATION)
-# clean_db(db_connection=db_connection)
+clean_db(db_connection=db_connection)
 database.format_images()
 database.generate_db_jsons()
-database.update_db_file(json_source="content2")
+database.update_db_file()
 view_all_tables_and_content(DATABASE_LOCATION)
 
 print("\n\n")
