@@ -80,7 +80,7 @@ def get_time():
 @app.route("/")
 def login():
 
-    return redirect(url_for('get_examples'))
+    # return redirect(url_for('get_examples'))
     return render_template("login.html")
 
 
