@@ -5,3 +5,7 @@ __pycache__/
 *.conf
 *.bin
 *.json
+
+flask/
+tester.py
+tester2.py

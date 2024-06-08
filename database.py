@@ -4,14 +4,18 @@ from PIL import Image
 from utils import save_load_program_data
 import os
 
+import sqlite3
+from pathlib import Path
+
+
 
 from databaseutils import prepare_data_base_jsons
 from databaseutils import view_all_tables_and_content
 from databaseutils import create_database, update_db , view_all_tables_and_content , clean_db
-import sqlite3
 
-from pathlib import Path
 from utils import get_time
+from config import DATA_BASE_FILE_TYPES
+
 
 
 class DatabaseManager:
@@ -31,8 +35,8 @@ class DatabaseManager:
         # self.changed_data  = self.data_base_path / 'CHANGED_DATA.json'
         self.root_dir.mkdir(exist_ok=True , parents=True)
 
-        self.data_base_file_types = [['.mp4' , '.mkv','.avi'] ,
-                                     ['.zip']]
+
+        self.data_base_file_types = DATA_BASE_FILE_TYPES
         self.full_paths = {}
         self.default_design = data_base_design if data_base_design else self.get_default_design()
         self.data_base_json_design = self.data_base_path /"DATA_BASE_DESIGN.json"
@@ -64,9 +68,14 @@ class DatabaseManager:
         def resize_image(image_path:Path , size = desired_size , universal_ext = '.jpg'):
             if image_path.exists():
                 image_path = rename_image(image_path=image_path , universal_ext=universal_ext)
-                image  = Image.open(image_path)
-                image = image.resize(size=size)
-                image.save(fp = image_path)
+                try:
+                    image  = Image.open(image_path)
+                    image = image.resize(size=size)
+                    image.save(fp = image_path)
+                except Exception as e:
+                    print(str(e))
+                    pass
+
 
             return image_path
 
@@ -125,9 +134,10 @@ class DatabaseManager:
         for name ,folder in data_base_design.items():
             folder = Path(folder)
             if "MOVIES" in str(folder) or "SERIES" in str(folder):
-                file_types = ['.mp4' , '.mkv']
+
+                file_types = DATA_BASE_FILE_TYPES[0]
             elif "GAMES" in str(folder):
-                file_types =['.zip']
+                file_types =DATA_BASE_FILE_TYPES[1]
             else:
                 raise ValueError("invalid file format in" , folder)
 
@@ -151,7 +161,6 @@ class DatabaseManager:
 
 
 class DataBaseIndex:
-
 
     def __init__(self , db_path) -> None:
         self.root_dir = Path(db_path).absolute()
@@ -354,7 +363,7 @@ class DataBaseIndex:
             # print("hete are se;cted ids",series_list)
             return series_list
         else:
-            print("found no series coeesponfinh to that name")
+            print("found no series corresponding to that name")
             return None
 
 
@@ -419,6 +428,28 @@ class DataBaseIndex:
                         final_res.append((series_id , name , image_src))
 
         return final_res
+
+
+    def grab_no_profiles(self):
+        db = sqlite3.connect(self.root_dir)
+        cursor = db.cursor()
+        query = "SELECT content_id, item_name FROM NO_PROFILES"
+        data =cursor.execute(query).fetchall()
+        final_data =[]
+        g = {}
+        for content_id  , content_name in data:
+            content_type = self.get_content_type(content_id)
+            content_path = self.get_full_path(content_id)
+
+            if content_type == "SERIES" or  'SERIES' in str(content_path):
+                content_name = self.get_series_name(content_name)
+                full_series = [self.get_full_path(i[0]) for i in self.get_full_series(content_name)]
+                
+                g[content_name] = full_series , content_type
+            else:
+                g[content_name] = [self.get_full_path(content_id) , content_type]
+            
+        return  g
 
 
 
