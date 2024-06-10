@@ -6,15 +6,15 @@ import os
 
 import sqlite3
 from pathlib import Path
-
+import random
 
 
 from databaseutils import prepare_data_base_jsons
 from databaseutils import view_all_tables_and_content
 from databaseutils import create_database, update_db , view_all_tables_and_content , clean_db
-
+from config import CONTENT_LOCATION , DATABASE_LOCATION , USER_DB_LOCATION
 from utils import get_time
-from config import DATA_BASE_FILE_TYPES
+from config import DATA_BASE_FILE_TYPES , DISPLAY_NO_IMAGE_CONTENT
 
 
 
@@ -201,7 +201,12 @@ class DataBaseIndex:
             for i in movies:
                 movie_id , item_name , image_src  =i
                 # print(self.determine_if_downloadable(series_id) , series_id , i[0:2])
-                if self.determine_if_downloadable(movie_id) and (image_src != None and image_src != "None"):
+                if not DISPLAY_NO_IMAGE_CONTENT:
+                    image_needed = (image_src != None and image_src != "None")
+                else:
+                    image_needed = True
+                    
+                if self.determine_if_downloadable(movie_id) and image_needed:
                     movies_copy.append(i)
                 else:
                     pass
@@ -245,8 +250,12 @@ class DataBaseIndex:
             series_copy = []
             for i in series:
                 series_id , item_name ,image_src =i
-                # print(self.determine_if_downloadable(series_id) , series_id , i[0:2])
-                if self.determine_if_downloadable(series_id) and (image_src != None and image_src != "None"):
+                        
+                if not DISPLAY_NO_IMAGE_CONTENT:
+                    image_needed = (image_src != None and image_src != "None")
+                else:
+                    image_needed = True
+                if self.determine_if_downloadable(series_id) and image_needed:
                     if i not in series_copy:
                         series_copy.append(i)
                     continue
@@ -322,12 +331,32 @@ class DataBaseIndex:
         if name:
             return name[0]
 
+    
+    def grab_common_image(self):
+        common_images_dir = Path(CONTENT_LOCATION) /"PROFILE_PICS" / "COMMON"
+        
+        if common_images_dir.exists():
+            images_list = list(common_images_dir.glob("*.jpg"))
+            
+            if len(images_list) > 1:
+                image_path = random.choice(images_list)
+            elif len(images_list) == 1:
+                image_path = images_list[0]
+            elif len(images_list) == 0:
+                return None
+            return image_path
+        else:
+            common_images_dir.mkdir(exist_ok = True , parents = True)
+            return None
+
     def get_image_src(self , content_id):
         cursor = sqlite3.connect(self.root_dir).cursor()
         name = cursor.execute(f"SELECT image_src FROM SHORT_TABLE WHERE id = {content_id}").fetchone()
-        if name:
+        if name[0]:
             return name[0]
-
+        else:
+            if DISPLAY_NO_IMAGE_CONTENT:
+                return self.grab_common_image()
 
     def get_series_name(self , series_name , parent= False):
         NAME = self.clean_name(series_name)
@@ -391,16 +420,25 @@ class DataBaseIndex:
             if self.determine_if_downloadable(content_id=content_id):
                 pass
             else:
-                if   (image_src != None and image_src != "None"):
+                if not DISPLAY_NO_IMAGE_CONTENT:
+                    image_needed = (image_src != None and image_src != "None")
+                else:
+                    image_needed = True
+                if   image_needed:
                     streaming_content[0].append((content_id , item_name , image_src))
 
         for series_data in series:
             content_id , item_name ,image_src = series_data
             # print("here is eslf  f" ,item_name ,self.determine_if_downloadable(content_id=content_id))
+            
             if self.determine_if_downloadable(content_id=content_id):
                 pass
             else:
-                if   image_src != None and image_src != "None":
+                if not DISPLAY_NO_IMAGE_CONTENT:
+                    image_needed = (image_src != None and image_src != "None")
+                else:
+                    image_needed = True
+                if   image_needed:
                     streaming_content[1].append((content_id , item_name ,image_src))
 
         return streaming_content
@@ -423,7 +461,11 @@ class DataBaseIndex:
             if data:
                 series_id =data[0]
                 image_src = data[1]
-                if image_src != None and image_src != "None":
+                if not DISPLAY_NO_IMAGE_CONTENT:
+                    image_needed = (image_src != None and image_src != "None")
+                else:
+                    image_needed = True
+                if image_needed:
                     if self.determine_if_downloadable(series_id) == downloadable:
                         final_res.append((series_id , name , image_src))
 
@@ -436,7 +478,7 @@ class DataBaseIndex:
         query = "SELECT content_id, item_name FROM NO_PROFILES"
         data =cursor.execute(query).fetchall()
         final_data =[]
-        g = {}
+        no_profile = {}
         for content_id  , content_name in data:
             content_type = self.get_content_type(content_id)
             content_path = self.get_full_path(content_id)
@@ -445,12 +487,11 @@ class DataBaseIndex:
                 content_name = self.get_series_name(content_name)
                 full_series = [self.get_full_path(i[0]) for i in self.get_full_series(content_name)]
                 
-                g[content_name] = full_series , content_type
+                no_profile[content_name] = full_series , content_type
             else:
-                g[content_name] = [self.get_full_path(content_id) , content_type]
+                no_profile[content_name] = [self.get_full_path(content_id) , content_type]
             
-        return  g
-
+        return  no_profile
 
 
     def grab_universally(self , name):
@@ -467,7 +508,7 @@ class DataBaseIndex:
             content_type = self.get_content_type(content_id=content_id[0])
         else:
             content_type = name
-        print("HEre os content type" , content_type)
+            
         if content_type == "SERIES":
             return self.get_series(name)
 
@@ -481,14 +522,13 @@ class DataBaseIndex:
                 return self.get_stream_data(name=name)
             # print("here is name" , name)
             return self.get_stream_data()
-        return self.get_game(name)
+        # return self.get_game(name)
 
     def __getitem__(self , name):
         if isinstance(name ,(list , tuple)):
             return list(map(self.grab_universally , name))
         return self.grab_universally(name)
 
-from config import CONTENT_LOCATION , DATABASE_LOCATION , USER_DB_LOCATION
 
 if __name__ == "__main__":
     database_path = CONTENT_LOCATION

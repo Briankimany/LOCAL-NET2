@@ -244,10 +244,16 @@ def stream_video(video_id):
 def get_image(filename):
     image_id = int(filename)
     image_path = db_indexer.get_image_src(image_id)
-    image_name = Path(image_path).name
-    image_dir = Path(image_path).parent
+    if image_path != None:
+        image_name = Path(image_path).name
+        image_dir = Path(image_path).parent
 
-    return send_from_directory(image_dir , image_name)
+        return send_from_directory(image_dir , image_name)
+    # else:
+    #     # print("here is the image path choosen" ,  db_indexer.grab_common_image())
+    #     image_path =  db_indexer.grab_common_image()
+    #     image_dir = image_path.parent
+    #     return send_from_directory(image_dir , image_path.name)
 
 
 
@@ -352,7 +358,6 @@ def buy_s(content_id):
 
     else:
         all_series = db_indexer.get_full_series(content_id)
-        print("here are all the series" , all_series)
         if all_series:
             for item in all_series:
                 print(f"adding {item[1]} to db")
