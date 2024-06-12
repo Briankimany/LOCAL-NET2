@@ -23,5 +23,5 @@ DISPLAY_NO_IMAGE_CONTENT = True
 
 PROFILES_DIR = CONTENT_LOCATION / 'PROFILE_PICS'
 PROFILES_DIR.mkdir(parents = True , exist_ok = True)
-
+REMOTE_LINK = "https://h27iwn67fk4s.connect.remote.it/series"
 
