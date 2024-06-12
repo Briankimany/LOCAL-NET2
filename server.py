@@ -77,9 +77,8 @@ def get_time():
     return formated_time
 
 
-@app.route("/")
+@app.route("/" ,  methods=['GET', 'POST'])
 def login():
-
     # return redirect(url_for('get_examples'))
     return render_template("login.html")
 
@@ -141,7 +140,6 @@ def get_file_link(video_id):
 @app.route("/home")
 @login_required
 def home():
-
     current_time = time.localtime()
     formated_time = time.strftime("%Y/%b/%d  %H:%M" , current_time)
     # formated_time = str(request.remote_addr)
@@ -249,12 +247,6 @@ def get_image(filename):
         image_dir = Path(image_path).parent
 
         return send_from_directory(image_dir , image_name)
-    # else:
-    #     # print("here is the image path choosen" ,  db_indexer.grab_common_image())
-    #     image_path =  db_indexer.grab_common_image()
-    #     image_dir = image_path.parent
-    #     return send_from_directory(image_dir , image_path.name)
-
 
 
 @app.route("/admin")
@@ -271,7 +263,7 @@ def see_streaming():
     movies , series = streaming_content
     series_content = db_indexer.get_distinc_series(downloadable=False)
     # print(series_content)
-    return render_template("stream2.html" , movies=movies ,series=series_content ,  time_now = get_time())
+    return render_template("stream.html" , movies=movies ,series=series_content ,  time_now = get_time())
 
 
 @app.route("/games")

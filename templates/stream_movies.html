@@ -5,76 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home Page</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style2.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-2/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-2/css/fontawesome.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-2/css/fontawesome.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-2/css/brands.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-2/css/solid.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='login_style.css') }}">
 
   <style>
 
-    /* Global Styles */
-
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-      
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #d4d4d4;
-        color: #fff;
-      }
-      
-      h1, h2 {
-        text-align: center;
-        color: rgb(64, 7, 156);
-      }
-      
-      h1 {
-        font-size: 26px;
-        margin-bottom: 1px;
-      }
-      
-      h2 {
-        font-size: 24px;
-        margin-bottom: 20px;
-      }
-      
-      /* Navigation Styles */
-      
-      header {
-        width: 100%;
-        background-color: rgb(202, 190, 184);
-        padding: 10px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      
-      nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      
-      nav ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: space-between;
-      }
-      
-      nav li {
-        margin-right: 20px;
-      }
-      
-      nav a {
-        text-decoration: none;
-        color: #333;
-        transition: color 0.2s ease-in-out;
-      }
-      
-      nav a:hover{
-        color: rgb(64, 7, 156);
-      }
       
       /* Hero Section Styles */
       
@@ -158,15 +97,34 @@
 </head>
 <body>
   <header>
-    <nav>
-      <ul>
-        <li><a href="/home">Home</a></li>
-        <li><a href="/games">GAMES</a></li>
-        <li><a href="/cart">cart</a></li>
-        <li><a href="/stream">STREAM</a></li>
-        <li><a href="/series">SERIES</a></li>
-      </ul>
-    </nav>
+    <nav class="navbar bg-dark border-bottom border-body navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">AJAY</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="nav-pills nav">
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="/home"><span><i class="fa-solid fa-house"></i></span>  Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/games">  <span><i class="fa-solid fa-gamepad"></i></span> Games</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/download"> <span> <i class="fa-solid fa-download"></i></span> Free download</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/stream"><span><i class="fa-solid fa-circle-play"></i></span> 
+                  stream</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active"  aria-current="page" href="/series"><span><i class="fa-solid fa-film"></i></span> Series</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav> 
   </header>
 
   <main>
@@ -191,7 +149,7 @@
             <a href="/stream_video/{{ content_id | escape }}">
               <img src="image/{{ content_id }}" alt="{{ content_name }}">
             </a>
-            <button><a href="/buy/{{content_id}}" BUY>BUY</a>></a></button>
+            <button><a href="/buy/{{content_id}}" BUY>BUY</a></a></button>
             <p>{{ content_name }}</p>
           </div>
         {% endfor %}

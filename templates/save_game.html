@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ content_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style2.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-2/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-2/css/fontawesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-2/css/fontawesome.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-2/css/brands.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-2/css/solid.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='login_style.css') }}">
+    
     <h1>{{ content_name }}</h1>
     <style>
     body, html {
@@ -49,6 +56,34 @@
 
 </head>
 <body>
+    <nav class="navbar bg-dark border-bottom border-body navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">AJAY</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="nav-pills nav">
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="/home"><span><i class="fa-solid fa-house"></i></span>  Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/games">  <span><i class="fa-solid fa-gamepad"></i></span> Games</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/download"> <span> <i class="fa-solid fa-download"></i></span> Free download</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/stream"><span><i class="fa-solid fa-circle-play"></i></span> 
+                    stream</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active"  aria-current="page" href="/series"><span><i class="fa-solid fa-film"></i></span>series</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav> 
     <div class="container">
         <div class="image-container">
             <img src="/image/{{content_id}}" alt="Top Image">

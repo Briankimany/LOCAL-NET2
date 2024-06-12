@@ -1,131 +1,80 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Home Page</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <style>
-    /* Base styles */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-    }
-    h1, h2 {
-      text-align: center;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Series</title>
 
-    /* Responsive tiling (adjust grid-template-columns as needed) */
-    @media (min-width: 768px) {
-      .pdf-container-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        grid-gap: 20px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-    }
-    @media (max-width: 767px) {
-      .pdf-container-grid {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        padding: 10px;
-      }
-      .pdf-container {
-        width: 100%;  /* Adjust width for single column on smaller screens */
-        margin: 10px 0;
-      }
-    }
-
-    /* Styles for individual PDF containers */
-    .pdf-container {
-      background-color: #fff;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      padding: 10px;
-      text-align: center;
-    }
-    .pdf-container a {
-      text-decoration: none;
-      color: #333;
-    }
-    .pdf-container img {
-      width: 100%;
-      height: auto;
-      display: block;
-      margin-bottom: 10px;
-    }
-    .pdf-container p {
-      margin: 0;
-      font-size: 16px;
-    }
-
-    /* Navigation and AI content styling */
-    header {
-      background-color: #eee;
-      padding: 10px 20px;
-    }
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    #ai-content {
-      padding: 20px;
-      border-top: 1px solid #ddd;
-    }
-    #ai-content h3 {
-      margin-bottom: 10px;
-    }
-  </style>
-
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-2/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-2/css/fontawesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-2/css/fontawesome.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-2/css/brands.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-2/css/solid.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='login_style.css') }}">
+    
 </head>
 <body>
-  <header>
-    <nav>
-      <h1>{{ time_now }}</h1>
-    </nav>
-  </header>
-
-  <nav>
-    <!-- <menu> -->
-      <h1>
-        <a href="/#">Home</a> 
-      </h1>
-      <h1>
-        <a href="/games">GAMES</a> 
-      </h1>
-      <h1>
-        <a href="/download">FREE DOWNLOAD</a> 
-      </h1>
-      <h1>
-        <a href="/stream">STREAM</a>
-      </h1>
-     
-    <!-- </menu> -->
-  </nav>
-  <div class="container-grid">
-    {% for vid_profile_pic, vid_path in content.items() %}
-      <div class="container">
-        <!-- <h1>{{vid_path.stem}}</h1> -->
-        <a href="stream_video/{{vid_path.name | escape }}">
-          <img src="image/{{ vid_profile_pic.name }}" alt="{{ vid_profile_pic.stem }}">
-        </a>
-        <p>{{ vid_profile_pic.stem }}</p>
+  <nav class="navbar bg-dark border-bottom border-body navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">AJAY</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="nav-pills nav">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="/home"><span><i class="fa-solid fa-house"></i></span>  Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/games">  <span><i class="fa-solid fa-gamepad"></i></span> Games</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/download"> <span> <i class="fa-solid fa-download"></i></span> Free download</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stream"><span><i class="fa-solid fa-circle-play"></i></span> 
+                stream</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active"  aria-current="page" href="/series"><span><i class="fa-solid fa-film"></i></span>series</a>
+          </li>
+        </ul>
       </div>
-    {% endfor %}
+    </div>
+  </nav> 
+  <div class="container text-center">
+    <h1 class="text-center">
+      SERIES
+    </h1>
+    <div class="row row-cols-2 row-cols-lg-4 g-2 g-lg-3">
+          {% for series_id ,series_name, series_profile in series %}
+          <div class="container">
+            <!-- <h1>{{series_id}}</h1> -->
+            <a href="/specific_series/{{series_id| escape }}">  <img src="image/{{ series_id }}" alt="{{series_name }}"> </a>
+            <p>{{ series_name }}</p>
+          <button><a href="/buy/{{series_name}}" BUY>BUY</a></a></button>
+        </div>
+        {% endfor %}
+      </div>
+      <h1 class="text-center">
+          MOVIES
+      </h1>
+      <div class="row row-cols-2 row-cols-lg-4 g-2 g-lg-3">
+        {% for movie_id , movie_name  , movies_profile in movies %}
+          <div class="container">
+            <!-- <h1>{{series_id}}</h1> -->
+            <a href="/stream_video/{{ movie_id }}"> <img src="image/{{ movie_id }}" alt="{{ movie_name }}"></a>
+            <p>{{ movie_name }}</p>
+            <button><a href="/buy/{{movie_id}}" BUY>BUY</a></a></button>
+          </div>
+        {% endfor %}
+    </div>
   </div>
 
-  </body>
+
+  <script src="{{ url_for('static', filename='bootstrap-2/js/bootstrap.bundle.js') }}"></script>
+</body>
 </html>
 
-
-
-
-
+ 
 

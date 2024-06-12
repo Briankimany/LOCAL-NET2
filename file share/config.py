@@ -1,6 +1,7 @@
 from pathlib import Path
 from master import save_load_program_data 
 import os
+# from cyber.scripts.common_functions import read_path
 local_share_conf_path = Path("local_share.conf")
 if local_share_conf_path.exists() and local_share_conf_path.is_file():
     confs = save_load_program_data(local_share_conf_path)

@@ -17,7 +17,7 @@ try:
     import os 
     import posixpath  , ntpath
     import re
-    from master import save_load_program_data
+    from master import save_load_program_data , save_pickle_dict
 except Exception as e:
     with open("logs.txt" , 'w') as file:
         file.write(str(e))
@@ -265,6 +265,16 @@ def multirun():
         final_dict = view_files_fiolders(files=files , folders=folders , parent_link=link.link)
 
 
-
+def cleint_tool():
+    file = Path("data.bin")
+    if file.exists():
+        info = save_pickle_dict(file)
+        link = info['LINK']
+        autorun(link = link)
+    else:
+        print("No file data found !!")
+    
 if __name__ == "__main__":
-    multirun()
+    # multirun()
+    # save_pickle_dict("data.bin" , {"LINK":"http://localhost:5050/PROFILE_PICS"} , 'wb')
+    cleint_tool()
