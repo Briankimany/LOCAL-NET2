@@ -11,7 +11,8 @@ from pathlib import Path
 from functools import wraps
 
 from database_index import DataBaseIndex
-from users import Users , UniqueUser
+from users import Users 
+from users_data import UniqueUser
 import logging
 from config import CONTENT_LOCATION , DATABASE_LOCATION , USER_DB_LOCATION , UPLOAD_DIR
 from pathlib import Path
