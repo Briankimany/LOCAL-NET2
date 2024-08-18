@@ -13,7 +13,6 @@ def get_chunk(file_path, start, chunk_size):
 
 
 def send_file_mine(filename):
-    
     filename = Path(filename)
     if not filename.is_file():
         raise FileNotFoundError(f"File not found: {filename}")
@@ -60,8 +59,7 @@ def send_file_mine(filename):
             return current_app.response_class(status=416)
         
         end = min(start + chunk_size, size - 1)
-        content_length = end - start + 1
-        print("Hrese is where to start" , request.headers['Range'] ,"Here is the start" , start , end , content_length) 
+        content_length = end - start + 1 
         response_headers = {
             "Content-Range": f"bytes {start}-{end}/{size}",
             "Accept-Ranges": "bytes",

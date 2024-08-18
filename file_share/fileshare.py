@@ -6,8 +6,7 @@ import re
 while True:
     print("Welome to local share .....")
     choice = input("Enter 1 to serve or to 2 recieve: ")
-   
-    choice =re.sub("\D", "",choice)
+    choice =re.sub("\t", "",choice)
     [re.sub(i , '' , choice) for i in ["'" , "'" , " "]]
     print(choice)
     print("hrre is your choice," , choice)

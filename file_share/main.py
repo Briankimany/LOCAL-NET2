@@ -5,19 +5,18 @@ try:
     from bs4 import BeautifulSoup as soup
     from pathlib import Path
     from urllib.parse import urlparse
-
-
+    
     import concurrent
     from concurrent.futures import ThreadPoolExecutor
 
     from format_link import  FormatLink
     from config import AUTOMATED ,SKIP_DIRS
-    from usserapp import Displaylink 
+    from displaylink import Displaylink 
 
     import os 
     import posixpath  , ntpath
     import re
-    from master import save_load_program_data , save_pickle_dict
+    from master import save_load_program_data , save_pickle_dict , log_str , get_time
 except Exception as e:
     with open("logs.txt" , 'w') as file:
         file.write(str(e))
@@ -70,9 +69,12 @@ def get_data(link=None):
             name = fileheaders['File-name']
             if os.name == 'posix':
                 name = str(name).replace(ntpath.sep , posixpath.sep)
-                # print("here is the new name" , name)
+                print("here is the new name" , name)
             final_name = Path(name).name
             destination = Path(name).parent  
+            message = get_time() + f"\t NAME :{final_name}\t\t\t\destination: {destination}\n"
+           
+            log_str(file_path=Path("get_data_function_logs.txt") , message=message)
             if destination != "":   
                     pass
             else:
@@ -89,15 +91,17 @@ def get_data(link=None):
 
 def savefile(link = None): 
     link, name, destination = get_data(link=link)
+    message = get_time() + f"\tLINK: {str(link)}\t\t\tNAME: {str(name)}\t\t\DESTINATION: {str(destination)}\n"
+    print("here is out from get data" , message)
+    log_str(file_path="save_file_function_logs.txt" , message=message )
     if link == None:
-        print("GOt None " , link , name , destination)
+        print("Got None " , link , name , destination)
         return None
     formated_link = FormatLink(link_data=(link, name), parent_dir=destination , chunk_size=1024 , in_data_base=True , is_verified_final_link=True)
-    # [print(i) for i in formated_link.__dict__.items()]
+   
     if not AUTOMATED:
         formated_link.inspect()
     if formated_link.file_size == 0:
-        # print("\n\n\nGot this file size as zero\n",formated_link.__dict__ , "\n\n\n")
         formated_link.log(message="got filse size as zero")
         return None
     return formated_link.start_download()
@@ -176,7 +180,7 @@ def singlerun(link = None):
         # print("\n\n\nGot this file size as zero\n",formated_link.__dict__ , "\n\n\n")
         formated_link.log(message="file size is zero")
         return None
-    data = formated_link.start_download()
+    formated_link.start_download()
 
 
 def start_download(link):
@@ -276,5 +280,6 @@ def cleint_tool():
     
 if __name__ == "__main__":
     # multirun()
-    # save_pickle_dict("data.bin" , {"LINK":"http://localhost:5050/PROFILE_PICS"} , 'wb')
-    cleint_tool()
+    save_pickle_dict("data.bin" , {"LINK":"http://192.168.184.239:5000/TORRENT/QBIT/COMPLETE/game%201"} , 'wb')
+    # cleint_tool()
+    multirun()

@@ -1,20 +1,26 @@
 import tempfile
-import more_itertools
 from datetime import timedelta
 import requests , random , time
 from tqdm.auto import tqdm
 import string
 from datetime import datetime, timedelta
 from pathlib import Path
-import os , shutil
+import  shutil
 import json
 import pickle
 import time
 
 
+
+
+
+def log_str(file_path: Path , message , mode = 'a'):
+    with open(file_path , mode) as file:
+        file.write(message)
+
+
 def get_time(string_obj  = True):
     current_time = time.localtime()
-    
     if not string_obj:
         return current_time
     formated_time = time.strftime("%Y/%b/%d  %H:%M:%S" , current_time)
@@ -123,15 +129,15 @@ def get_file_size(link):
         if link.final_link == None:
             # print(link.url , link.name)
             response = requests.head(link.url)
-            g =0
+            max_count =0
             redirect_link = link.url
             while int(response.status_code) == 302:
                 # time.sleep(1.5)
                 # print(response.status_code , link)
                 redirect_link = response.headers['Location']
                 response = requests.head(redirect_link)
-                g+=1
-                if g == 10:
+                max_count+=1
+                if max_count == 10:
                     return None , None
             if "File-Size" in response.headers:
                 file_size = int( response.headers["File-Size"]) / 1024**2

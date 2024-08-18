@@ -6,7 +6,7 @@ cffi==1.16.0
 charset-normalizer==3.3.2
 click==8.1.7
 cryptography==42.0.7
-cyber @ git+https://github.com/Briankimany/enrypter_decrypter.git@c826f514122713b4e64f1e4904fc9ca6d34f2e67
+#cyber @ git+https://github.com/Briankimany/enrypter_decrypter.git@c826f514122713b4e64f1e4904fc9ca6d34f2e67
 Flask==3.0.3
 idna==3.7
 itsdangerous==2.1.2

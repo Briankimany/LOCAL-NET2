@@ -1,30 +1,36 @@
 
 from flask import Flask
-from flask import  redirect, url_for , render_template , send_from_directory , make_response , request  , current_app , send_file , session , render_template_string
+from flask import  redirect, url_for , render_template , send_from_directory , make_response , request  , current_app , send_file , session 
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
 import re
 import os
 import time
 from pathlib import Path
-from utils import save_load_program_data
 from functools import wraps
 
-
 from database import DataBaseIndex
-from users import Users
+from users import Users , UniqueUser
 import logging
-
-
 from config import CONTENT_LOCATION , DATABASE_LOCATION , USER_DB_LOCATION , UPLOAD_DIR
 from pathlib import Path
+from file_share.master import log_str , save_load_program_data , get_time
 
 
-users_db = Users(CONTENT_LOCATION)
 app = Flask(__name__)
 app.config['STATIC_FOLDER'] = os.path.abspath('templates/static')
-
-
 app.secret_key='KIMANI'
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"]
+)
+
+users_db = Users(CONTENT_LOCATION)
 db_indexer = DataBaseIndex(db_path=DATABASE_LOCATION)
+
+
 
 app.logger.setLevel(logging.DEBUG)  # Set the logging level (DEBUG, INFO, etc.)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -71,10 +77,6 @@ def true_login_required(func):
 
 
 
-def get_time():
-    current_time = time.localtime()
-    formated_time = time.strftime("%Y/%b/%d  %H:%M" , current_time)
-    return formated_time
 
 
 @app.route("/" ,  methods=['GET', 'POST'])
@@ -99,7 +101,8 @@ def authenticate():
             session['user'] = username
             return redirect(url_for('home'))
         else:
-            info = f"User {session.get('user')} wrong passwd {session.get('passwd')}"
+            info = f"{get_time(string_obj= True)}\tUser {session.get('user')} wrong passwd {session.get('passwd')}"
+            log_str("wrong passwd.txt" , message=info)
             return redirect(url_for('login'))
     else:
         print("creating aa new account")
@@ -149,6 +152,7 @@ def home():
 
 @app.route("/download/<content_id>", methods=["GET"])
 @login_required
+@limiter.limit("2 per minute")
 def download_video(content_id):
 
     filename = db_indexer.get_full_path(content_id=content_id)
@@ -262,7 +266,6 @@ def see_streaming():
     streaming_content = db_indexer['STREAM']
     movies , series = streaming_content
     series_content = db_indexer.get_distinc_series(downloadable=False)
-    # print(series_content)
     return render_template("stream.html" , movies=movies ,series=series_content ,  time_now = get_time())
 
 
@@ -336,45 +339,81 @@ def cart(userid):
 
 
 
-##new fwtures
+##new features
+
+
+
+def return_to_parent(content_id):
+    if not  str(content_id).isdigit():
+        its_series = True
+        content_id = db_indexer.get_random_series_id(series_name=content_id)
+    else:
+        its_series = False
+
+  
+    content_type = db_indexer.get_content_type(int(content_id))
+
+    if content_type == 'MOVIES':
+        return redirect(url_for('home'))
+    if content_type == 'SERIES':
+        if its_series:
+            return redirect(url_for("show_available_series"))
+        else:
+            return redirect(url_for("series_list" , series_id= content_id))
+    
+    if content_type == 'GAMES':
+        return redirect(url_for("get_examples"))
+    if content_type == 'STREAM':
+        is_movie = db_indexer.is_movie(content_id=content_id)
+        if is_movie:
+             return redirect(url_for("see_streaming"))
+        else:
+            if its_series:
+                return redirect(url_for("see_streaming" )) 
+            return redirect(url_for("series_list" ,series_id= content_id) ) 
 
 
 @app.route('/buy/<content_id>')
 @login_required
 def buy_s(content_id):
-
     user_name = session.get("user")
     user_id = users_db.get_userid(username=user_name)
+    print("here is user name" , user_name)
+    user_unique = UniqueUser(db_folder=CONTENT_LOCATION  , user_name=user_name)
+
     if str(content_id).isdigit():
         users_db.update_consumer_table(user_id=user_id , content_id=content_id)
-
+        user_unique.update_consumer_table(content_id=content_id)
     else:
         all_series = db_indexer.get_full_series(content_id)
+        print(all_series)
         if all_series:
             for item in all_series:
-                print(f"adding {item[1]} to db")
                 users_db.update_consumer_table(user_id=user_id , content_id=item[0])
-
-    return redirect(url_for(f"cart" , userid = user_id))
-
+                user_unique.update_consumer_table(content_id=item[0])
+    
+    return return_to_parent(content_id=content_id)
 
 @app.route("/up")
 def up():
    return render_template("upload.html")
-@app.route("/upload" , methods = ['POST'])
+
+
+@app.route("/upload", methods=['POST'])
 def upload():
-
-    file = request.files['file']
-    file_path = Path(UPLOAD_DIR) / file.filename
-
-    file.save(str(file_path))
+    files = request.files.getlist('files')
+    for file in files:
+        file_path = UPLOAD_DIR / file.filename
+        file_path.parent.mkdir(parents = True , exist_ok = True)
+        if file_path.is_file() or 1 == 1:
+            file.save(str(file_path))
+        print(f"Uploaded {file_path}")
 
     return render_template("upload.html")
 
-
-
-
-
+@app.route('/download' , methods = ['GET' , 'POST'])
+def route_download():
+    return redirect('http://localhost/home')
 
 
 

@@ -9,13 +9,12 @@ from master import convert_duration_format , generate_random_chars , get_file_si
 from download_2 import download_bit_by_bit , download_files
 
 
-
-    
 class FormatLink:
-    def __init__(self, link_data=None  , include_radom = False , parent_dir = None , in_data_base = True ,source_json = None , save_info = True , chunk_size = (1024**2)*3 , is_verified_final_link = False) -> None:
-        """
+    """
         Link data = (link , description , duration)
-        """
+    """
+    def __init__(self, link_data=None  , include_radom = False , parent_dir = None , in_data_base = True ,source_json = None , save_info = True , chunk_size = (1024**2)*3 , is_verified_final_link = False) -> None:
+
         self.is_final_link = False
         self.in_data_base = in_data_base
         self.save_per_isnstance = save_info
@@ -45,7 +44,6 @@ class FormatLink:
             else:
                 self.extension = self.name
             
-            
             if isinstance(link_data[1] , (tuple, list)):
                 self.name = str(link_data[1][0]) +"_"+ generate_random_chars(k=4) if include_radom else  str(link_data[1][0])
                 if len(link_data[1]) >= 2:
@@ -60,10 +58,7 @@ class FormatLink:
                 else:
                     self.name = None
                     self.length = None
-                    # print("setting name to none")
-                    # raise ValueError("link name cant be none")
         
-
             if self.name != None:
                 try:
                     j =self.name
@@ -72,9 +67,7 @@ class FormatLink:
                 except Exception as e:
                     pass
                 
-                
-            ## clean the name and set the name to random chars if name was not given 
-            self.name = self.name.replace("/" , "_") if self.name != None else f"Random_name_{generate_random_chars(k=4)}"
+            self.name = self.name.replace(os.path.sep , "_") if self.name != None else f"Random_name_{generate_random_chars(k=4)}"
             if len(self.name.split(" ")) > 15:
                 name_parts = self.name.split(" ")
                 self.short_name = " ".join(name_parts[0:3]) + "..." + " ".join(name_parts[-3:])
@@ -102,15 +95,15 @@ class FormatLink:
             
         if source_json != None:
             saved_state = save_load_program_data(path=source_json)
-            # print("Path given is " , source_json)
+           
             default_state.update(saved_state)
-            # print("data loaded is")
+         
             for key , value in default_state.items():
                 setattr(self , key , value)
-            # print("state after updating" )
+         
             if self.extension in viable_ext:
                 self.is_final_link = True
-            # [print(i) for i in self.__dict__.items()]
+           
             self.in_data_base= in_data_base
             if chunk_size != None:
                 self.chunk_size = chunk_size
@@ -123,9 +116,6 @@ class FormatLink:
                 except Exception as e:
                     pass
           
-
-                        
-        
         if parent_dir:
             self.parent_dir = Path(parent_dir)
         else:
@@ -160,12 +150,10 @@ class FormatLink:
                 self.length = change_str_deltatime(self.length)
     
             self.prepare_link() 
-        # [print(i) for i in self.__dict__.items()]
-        # print("\n\n")
         self.parent_dir.mkdir(parents = True , exist_ok = True)
         if self.is_final_link:
             starting_data = self.get_state_data()
-            # print("saving the current attr")
+      
             save_load_program_data(path= self.json_path, data= starting_data , mode='w')
 
     
@@ -185,8 +173,7 @@ class FormatLink:
         if not self.is_final_link:
                 error_path =self.log_dir/self.name
                 error_path = error_path.with_suffix(".json")
-        
-        # print(error_path)
+  
         logs = link.get_state_data()
         logs.update({"Error":info})
         save_load_program_data(path=error_path , data=logs , mode='w')
@@ -233,7 +220,7 @@ class FormatLink:
                 
     def start_download(self):
         if self.full_path.exists():
-            # print(f"Resuming download from : {self.hard_drive_file_size}")
+          
             pass
         download_bit_by_bit(self)
         return None

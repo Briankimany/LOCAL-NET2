@@ -1,8 +1,9 @@
 import sqlite3
-from utils import get_time , save_load_program_data 
-from databaseutils import view_all_tables_and_content
-
 from pathlib import Path
+
+from utils import get_time , save_load_program_data 
+
+
 class Users:
     """
     This is a clas to create the users data base
@@ -13,11 +14,10 @@ class Users:
                 userid  username  password
                 
     """
-    
     def __init__(self , db_folder ,debuging = True) -> None:
         db_path = Path(db_folder)/ "users.db"
         self.debuging = debuging
-        print(db_path)
+       
         self.db_path = db_path if isinstance(db_path , Path) else Path(db_path)
         self.LOG_DIR = self.db_path.parent
         # self.LOG_DIR.mkdir(parents=True , exist_ok=True)
@@ -47,7 +47,7 @@ class Users:
     def add_user(self , username , password):
         """INSERT INTO  SERIES (content_id , item_name ,series_name , image_src ) VALUES (?,?,?,?)", (media_id,name , series_name , image_src)"""
         query = f"INSERT INTO CREDENTIALS (username , password)  VALUES ({username} , {password})"
-        print("hre is query" , query)
+      
         db_connection=  self.get_cursor()
         cursor = db_connection.cursor()
         cursor.execute("INSERT INTO CREDENTIALS (username , password)  VALUES (?,?)" ,(username, password))
@@ -55,7 +55,7 @@ class Users:
         self.log(query=query)
         db_connection.commit()
             
-        view_all_tables_and_content(self.db_path)
+        # view_all_tables_and_content(self.db_path)
             
         
     
@@ -99,21 +99,18 @@ class Users:
         """TABLE FORMAT
             user id | content id | time
             
-            "INSERT INTO CREDENTIALS (username , password)  VALUES ({username} , {password})"
+            "INSERT INTO CONTENT_CONSUMPTION (user_id, content_id, time) VALUES (?,?,?)"
         """
         db_connection = self.get_cursor()
         cursor = db_connection.cursor()
         time = get_time(string_obj=True)
         query_ = f"INSERT INTO CONTENT_CONSUMPTION (user_id ,content_id , time ) VALUES ({user_id} , {content_id} , {time})"
-        print(query_)
         query = "INSERT INTO CONTENT_CONSUMPTION (user_id, content_id, time) VALUES (?,?,?)"
         cursor.execute(query, (user_id, content_id, time))
-        # cursor.execute(query)
-        
+     
         if self.debuging:
             self.log(query=query_)
         db_connection.commit()
-        view_all_tables_and_content(self.db_path)
-        
-        
-        
+        # view_all_tables_and_content(self.db_path)
+
+

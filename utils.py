@@ -13,6 +13,8 @@ def get_time(string_obj  = True):
     formated_time = time.strftime("%Y/%b/%d  %H:%M:%S" , current_time)
     return formated_time
 
+
+
 def get_max_dict(dict1 , dict2):
     max_d = dict1
     min_d = dict2

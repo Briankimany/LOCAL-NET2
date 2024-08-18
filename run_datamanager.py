@@ -13,6 +13,7 @@ clean_db(db_connection=db_connection)
 database.format_images()
 database.generate_db_jsons()
 database.update_db_file()
+print("\n\n")
 view_all_tables_and_content(DATABASE_LOCATION)
 
 print("\n\n")

@@ -17,7 +17,9 @@ ENV_LOCATION = CONTENT_LOCATION / '.env'
 
 
 DATA_BASE_FILE_TYPES = [['.mp4' , '.mkv','.avi'] ,
-                                     ['.zip' , '.tar']]
+                                     ['.zip' , '.tar' , '.nfo' , '.url' , '.iso' , '.torrent' , '.bin' , '.exe' , '.url' , '.bat']]
+
+
 
 DISPLAY_NO_IMAGE_CONTENT = True
 

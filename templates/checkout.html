@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            padding-top: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .form-control {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Checkout Page</h1>
+        <form method="post" action="{{ url_for('submit') }}" id="checkout-form">
+            <div class="form-group">
+                <label for="item">Item:</label>
+                <input type="text" class="form-control" id="item" name="item" required>
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="number" class="form-control" id="quantity" name="quantity" min="1" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Checkout</button>
+        </form>
+        <div id="feedback" class="text-center mt-3"></div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        document.getElementById('checkout-form').addEventListener('submit', function(event) {
+            const item = document.getElementById('item').value;
+            const quantity = document.getElementById('quantity').value;
+
+            if (!item || quantity <= 0) {
+                document.getElementById('feedback').innerHTML = '<div class="alert alert-danger">Please provide valid inputs.</div>';
+                event.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

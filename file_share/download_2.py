@@ -82,10 +82,6 @@ def download_resume(response, url, mode, downloaded_size , max_time , chunk_size
 
 def manage_download(url, max_time  , parent_object = None):
     
-    file_headers = requests.head(url.final_link)
-    if "File-name" in file_headers.headers:
-        url.full_path = Path(file_headers.headers['File-name'])
-
     downloaded_size = int(os.path.getsize(url.full_path)) if url.full_path.is_file() else 0
     url.remaining_size = (url.file_size * (1024**2)) - downloaded_size
     url.remainig_size_percentage =  url.remaining_size / (url.file_size * (1024**2)) 
