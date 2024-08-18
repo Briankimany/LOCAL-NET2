@@ -5,7 +5,7 @@ __pycache__/
 *.conf
 *.bin
 *.json
-nyaga/
+*.txt
 
 flask/
 tester.py
