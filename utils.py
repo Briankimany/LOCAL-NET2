@@ -2,8 +2,13 @@
 import tempfile , json
 from pathlib import Path
 import os , shutil
-import time
+import time , string , random
 
+
+
+def generate_random_chars(k):
+    random_chars = ''.join(random.choices(string.ascii_letters + string.digits, k=k))
+    return random_chars
 
 def get_time(string_obj  = True):
     current_time = time.localtime()

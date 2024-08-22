@@ -3,6 +3,11 @@ from flask import Flask
 from flask import  redirect, url_for , render_template , send_from_directory , make_response , request  , current_app , send_file , session 
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask import Flask, request, jsonify
+from flask_httpauth import HTTPTokenAuth
+
+
+
 
 import re
 import os
@@ -20,6 +25,8 @@ from file_share.master import log_str , save_load_program_data , get_time
 
 
 app = Flask(__name__)
+auth = HTTPTokenAuth(scheme='Bearer')
+
 app.config['STATIC_FOLDER'] = os.path.abspath('templates/static')
 app.secret_key='KIMANI'
 limiter = Limiter(
@@ -31,7 +38,11 @@ limiter = Limiter(
 users_db = Users(CONTENT_LOCATION)
 db_indexer = DataBaseIndex(db_path=DATABASE_LOCATION)
 
-
+# In a real application, you would store these tokens securely, perhaps in a database
+TOKENS = {
+    "123456789": "ajay",
+    "987654321": "patrick",
+}
 
 app.logger.setLevel(logging.DEBUG)  # Set the logging level (DEBUG, INFO, etc.)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -400,17 +411,72 @@ def up():
    return render_template("upload.html")
 
 
-@app.route("/upload", methods=['POST'])
-def upload():
-    files = request.files.getlist('files')
-    for file in files:
-        file_path = UPLOAD_DIR / file.filename
-        file_path.parent.mkdir(parents = True , exist_ok = True)
-        if file_path.is_file() or 1 == 1:
-            file.save(str(file_path))
-        print(f"Uploaded {file_path}")
+# @app.route("/upload", methods=['POST'])
+# def upload():
+#     files = request.files.getlist('files')
+#     for file in files:
+#         file_path = UPLOAD_DIR / file.filename
+#         file_path.parent.mkdir(parents = True , exist_ok = True)
+#         if file_path.is_file() or 1 == 1:
+#             file.save(str(file_path))
+#         print(f"Uploaded {file_path}")
 
-    return render_template("upload.html")
+#     return render_template("upload.html")
+
+
+
+@auth.verify_token
+def verify_token(token):
+    if token in TOKENS:
+        return TOKENS[token]
+
+@app.route("/upload", methods=['POST'])
+@auth.login_required
+def upload():
+    current_user = auth.current_user()
+    print('files' in request.files)
+    if 'files' in request.files:
+        # File upload
+        files = request.files.getlist('files')
+        uploaded_files = []
+        for file in files:
+            file_path =file_path = UPLOAD_DIR / file.filename
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            file.save(str(file_path))
+            uploaded_files.append(str(file_path))
+            print(f"Uploaded {file_path}")
+        
+        return jsonify({"message": "Files uploaded successfully", "files": uploaded_files}), 200
+    
+    elif request.is_json:
+        # JSON data upload
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data received"}), 400
+        
+        if 'file-name' in request.headers:
+            filename = Path(request.headers['file-name'])/f"{current_user}.json" 
+        else:
+            filename = f"{current_user}_{get_time()}.json"
+
+
+        file_path = UPLOAD_DIR / filename
+        file_path.parent.mkdir(parents=True , exist_ok=True)
+        try:
+            if file_path.exists() and file_path.is_file():
+                saved_state = save_load_program_data(file_path)
+            else:
+                saved_state={}
+    
+            saved_state.update(data)
+            save_load_program_data(path=file_path , mode='w' , data=saved_state )
+
+            return jsonify({"message": f"Data saved successfully to {filename}"}), 200
+        except Exception as e:
+            return jsonify({"error": f"Failed to save data: {str(e)}"}), 500
+    
+    else:
+        return jsonify({"error": "Unsupported content type"}), 400
 
 @app.route('/download' , methods = ['GET' , 'POST'])
 def route_download():

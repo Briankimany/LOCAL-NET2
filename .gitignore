@@ -6,7 +6,9 @@ __pycache__/
 *.bin
 *.json
 *.txt
+*.env
 
+test.py
 flask/
 tester.py
 tester2.py
