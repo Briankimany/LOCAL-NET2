@@ -414,7 +414,7 @@ def upload():
 
 @app.route('/download' , methods = ['GET' , 'POST'])
 def route_download():
-    return redirect('http://localhost/home')
+   return redirect(url_for('home'))
 
 
 
