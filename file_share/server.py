@@ -5,6 +5,7 @@ from config import SERVE_FOLDER , RELATIVE_DIR , SKIP_DIRS
 
 app = Flask(__name__)
 
+
 def get_chunk(file_path, start, chunk_size):
     with open(file_path, "rb") as f:
         f.seek(start)

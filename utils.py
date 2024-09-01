@@ -4,6 +4,19 @@ from pathlib import Path
 import os , shutil
 import time , string , random
 
+import uuid
+
+def generate_order_id():
+
+    unique_id = str(uuid.uuid4()).replace("-", "")
+ 
+    random_part = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+    
+    order_id = f"{unique_id[:8]}-{random_part}"
+    
+    return order_id
+
+
 
 
 def generate_random_chars(k):

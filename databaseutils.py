@@ -243,11 +243,11 @@ def create_database(db_file):
     # print("adding talaes , to" , db_file)
     cursor.execute("""CREATE TABLE IF NOT EXISTS FULL_TABLE (content_id , category ,downloadable)""")
     cursor.execute("""CREATE TABLE IF NOT EXISTS SHORT_TABLE (id INTEGER PRIMARY KEY , item_name  ,destination , image_src)""")
-    cursor.execute("""CREATE TABLE IF NOT EXISTS MOVIES (content_id , item_name , image_src )""")
-    cursor.execute("""CREATE TABLE IF NOT EXISTS SERIES (content_id  , item_name , series_name , image_src)""")
-    cursor.execute("""CREATE TABLE IF NOT EXISTS GAMES (content_id  , item_name , image_src)""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS MOVIES (content_id INTEGER , item_name , image_src )""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS SERIES (content_id INTEGER , item_name , series_name , image_src)""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS GAMES (content_id  INTEGER, item_name , image_src)""")
 
-    cursor.execute("""CREATE TABLE IF NOT EXISTS NO_PROFILES (content_id  , item_name)""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS NO_PROFILES (content_id INTEGER  , item_name)""")
 
     conn.commit()
     conn.close()

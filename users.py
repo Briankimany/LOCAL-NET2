@@ -22,11 +22,11 @@ class Users:
         self.LOG_DIR = self.db_path.parent
         # self.LOG_DIR.mkdir(parents=True , exist_ok=True)
         
-        db_connection = sqlite3.connect(self.db_path)
+        db_connection = sqlite3.connect(self.db_path.absolute())
         cursor = db_connection.cursor()
         ## initialize the tables if not present
         cursor.execute("CREATE TABLE IF NOT EXISTS CREDENTIALS (userid INTEGER PRIMARY KEY  , username UNIQUE, password)")
-        cursor.execute("CREATE TABLE IF NOT EXISTS CONTENT_CONSUMPTION (user_id ,content_id , time)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS CONTENT_CONSUMPTION (user_id INTEGER,content_id , time)")
         db_connection.commit()
         
         

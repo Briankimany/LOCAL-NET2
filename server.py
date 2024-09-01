@@ -1,6 +1,6 @@
 
 from flask import Flask
-from flask import  redirect, url_for , render_template , send_from_directory , make_response , request  , current_app , send_file , session 
+from flask import  redirect, url_for , render_template , send_from_directory , make_response , request  , current_app , send_file , session  , Response
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask import Flask, request, jsonify
@@ -22,6 +22,10 @@ import logging
 from config import CONTENT_LOCATION , DATABASE_LOCATION , USER_DB_LOCATION , UPLOAD_DIR
 from pathlib import Path
 from file_share.master import log_str , save_load_program_data , get_time
+from urllib.parse import urlparse
+
+
+from urllib.parse import urlencode, urlunparse
 
 
 app = Flask(__name__)
@@ -29,10 +33,11 @@ auth = HTTPTokenAuth(scheme='Bearer')
 
 app.config['STATIC_FOLDER'] = os.path.abspath('templates/static')
 app.secret_key='KIMANI'
-limiter = Limiter(
+
+download_limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["200 per day", "50 per hour"]
+
 )
 
 users_db = Users(CONTENT_LOCATION)
@@ -53,16 +58,12 @@ app.logger.addHandler(handler)
 
 
 
-
-# def login_required(func):
-#     @wraps(func)
-#     def decorated_function(*args, **kwargs):
-#         # print("calling the decorated funtion")
-#         if 'user' not in session:
-#         if 'user' not in session or session['user'].lowwer() != 'Ajay':
-#             return redirect(url_for('get_examples'))
-#         return func(*args, **kwargs)
-#     return decorated_function
+def set_current_url(scheme, server_addres , path='' , query_params= {},fragment=""  ,set_url = True):
+    encoded_params = urlencode(query_params)
+    url = urlunparse((scheme ,server_addres , path , '', encoded_params, fragment ))
+    if  set_url:
+        session['current_url'] = url
+    return url
 
 
 def login_required(func):
@@ -76,31 +77,24 @@ def login_required(func):
 
 
 
-
-
-def true_login_required(func):
-    @wraps(func)
-    def decorated_function(*args, **kwargs):
-        # print("calling the decorated funtion")
-        if 'user' not in session:
-            return redirect(url_for('login'))
-        return func(*args, **kwargs)
-    return decorated_function
-
-
-
-
-
 @app.route("/" ,  methods=['GET', 'POST'])
 def login():
     # return redirect(url_for('get_examples'))
-    return render_template("login.html")
+    return render_template("login/index.html")
+
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    session.pop('user')
+    return redirect(url_for('login'))
 
 
 # Route to handle form submission
 @app.route('/authenticate', methods=['POST'])
 def authenticate():
-
+    print(request.form)
     username = request.form['username']
     password = request.form['password']
 
@@ -124,7 +118,7 @@ def authenticate():
 
 @app.route("/register")
 def register():
-    return render_template("register.html")
+    return render_template("login/adduser.html")
 
 
 
@@ -155,6 +149,10 @@ def get_file_link(video_id):
 @app.route("/home")
 @login_required
 def home():
+    set_current_url(scheme = 'http',
+                    server_addres=request.host ,
+                    path=request.path)
+
     current_time = time.localtime()
     formated_time = time.strftime("%Y/%b/%d  %H:%M" , current_time)
     # formated_time = str(request.remote_addr)
@@ -164,7 +162,6 @@ def home():
 
 @app.route("/download/<content_id>", methods=["GET"])
 @login_required
-@limiter.limit("2 per minute")
 def download_video(content_id):
 
     filename = db_indexer.get_full_path(content_id=content_id)
@@ -245,6 +242,9 @@ def get_template_min(filename):
 @app.route('/stream_video/<video_id>')
 @login_required
 def stream_video(video_id):
+    set_current_url(scheme = 'http',
+                    server_addres=request.host ,
+                    path=request.path)
     video_url =get_file_link(video_id)
 
     if db_indexer.determine_if_downloadable(content_id=video_id):
@@ -274,7 +274,9 @@ def admin():
 @app.route("/stream")
 @login_required
 def see_streaming():
-
+    set_current_url(scheme = 'http',
+                    server_addres=request.host ,
+                    path=request.path)
     streaming_content = db_indexer['STREAM']
     movies , series = streaming_content
     series_content = db_indexer.get_distinc_series(downloadable=False)
@@ -284,6 +286,9 @@ def see_streaming():
 @app.route("/games")
 # @login_required
 def get_examples():
+    set_current_url(scheme = 'http',
+                    server_addres=request.host ,
+                    path=request.path)
     games_data = db_indexer['GAMES']
     return render_template("games.html" , time_now = get_time() , content = games_data)
 
@@ -314,6 +319,9 @@ def get_game(game_id):
 @app.route("/series")
 @login_required
 def show_available_series():
+    set_current_url(scheme = 'http',
+                    server_addres=request.host ,
+                    path=request.path)
     series_content = db_indexer.get_distinc_series(downloadable=True)
     return render_template("series.html" , content = series_content)
 
@@ -321,7 +329,10 @@ def show_available_series():
 @app.route("/specific_series/<series_id>")
 @login_required
 def series_list(series_id):
-
+    set_current_url(scheme = 'http',
+                    server_addres=request.host ,
+                    path=request.path)
+    
     series_name = db_indexer.get_series_name(series_id)
     content = sorted(db_indexer.get_full_series(series_name=series_name))
     vid_link = get_file_link(series_id)
@@ -330,16 +341,17 @@ def series_list(series_id):
         video_type = full_path.split(".")[-1]
     else:
         video_type = 'mp4'
-    return render_template("stream_series.html" , video_link = vid_link , content = content)
+    return render_template("stream_series.html" , video_link = vid_link , content = content , video_id= series_id)
 
 
 
-@app.route("/stream_video_premium/image/<content_id>")
-@app.route("/specific_series/image/<content_id>")
-@app.route("/stream_video/image/<content_id>")
-@app.route("/g_download/image/<content_id>")
-def re_route_image(content_id):
-    return redirect   (url_for(f"get_image" , filename = content_id))
+# @app.route("/stream_video_premium/image/<content_id>")
+# @app.route("/specific_series/image/<content_id>")
+# @app.route("/stream_video/image/<content_id>")
+# @app.route("/g_download/image/<content_id>")
+# def re_route_image(content_id):
+#     print("rerouting the wrong way" , content_id)
+#     return redirect   (url_for(f"get_image" , filename = content_id))
 
 
 
@@ -391,6 +403,7 @@ def buy_s(content_id):
     user_name = session.get("user")
     user_id = users_db.get_userid(username=user_name)
     print("here is user name" , user_name)
+
     user_unique = UniqueUser(db_folder=CONTENT_LOCATION  , user_name=user_name)
 
     if str(content_id).isdigit():
@@ -478,17 +491,124 @@ def upload():
     else:
         return jsonify({"error": "Unsupported content type"}), 400
 
-@app.route('/download' , methods = ['GET' , 'POST'])
+
+
+
+
+
+@app.route("/checkout" , methods = ['GET'])
+def show_checkout():
+   
+    server_addres = request.host
+    user_name = session.get("user")
+    
+    back_link= session.get("current_url")
+    
+    params = {'user_name':user_name,"server_addres":back_link}
+   
+    check_out_page_url = set_current_url(scheme='http',
+                                         server_addres=server_addres +":8501",
+                                         query_params=params,
+                                         path='' , set_url=False )
+    
+
+    return redirect(check_out_page_url)
+
+
+
+def generate_limited(file_path, start, end):
+    """Generate file in chunks with a limited download speed and specified range."""
+    with open(file_path, "rb") as file:
+        file.seek(start)
+        while True:
+            data = file.read(min(end - start + 1, 1024))
+            if not data:
+                break
+            yield data
+
+
+def claculate_sleep_time(file_size):
+    max_speed = 1024*700
+    time_in_sec = file_size /(max_speed)
+    time_in_minutes = time_in_sec / 60
+    time_in_hrs = time_in_minutes/60
+
+    return time_in_sec
+
+
+
+
+@download_limiter.limit('3/minute')
+@app.route("/send_file/<path>")
+def send_file(path):
+    """Serve a media file with a limited download speed, getting the file path and range from the request parameters."""
+    file_path = db_indexer.get_full_path(int(path))
+    
+    if not file_path:
+        return "File path is missing", 400
+
+
+    if not os.path.isfile(file_path):
+        return "File not found", 404
+
+    # Get the requested range
+    range_header = request.headers.get("Range", None)
+    if range_header:
+        start, end = map(int, range_header.replace("bytes=", "").split("-"))
+    else:
+        start = 0
+        end = os.path.getsize(file_path) - 1
+
+    # Set the `Content-Range` header to inform the client about the range of the response
+    content_range = f"bytes {start}-{end}/{os.path.getsize(file_path)}"
+    headers = {
+        "Content-Range": content_range,
+        "Accept-Ranges": "bytes",
+        "Content-Length": str(end - start + 1),
+    }
+
+    def generate_limited_response():
+        """Generate file in chunks with a limited download speed and specified range."""
+        start_time = time.time()
+        bytes_sent = 0
+
+        file_size = os.path.getsize(file_path) - start
+        for data in generate_limited(file_path, start, end):
+            delay = claculate_sleep_time(file_size=file_size)
+            if file_size > 0:
+                time.sleep(1/delay)
+            bytes_sent += len(data)
+            yield data
+
+    response = Response(generate_limited_response(), headers=headers, mimetype=("video/mp4" if file_path.endswith(".mp4") else "video/x-msvideo"))
+
+    filename = os.path.basename(file_path)
+    response.headers["Content-Disposition"] = f"attachment; filename*=UTF-8''{filename}"
+
+    return response
+
+
+@app.route('/watchlist' , methods = ['GET' , 'POST'])
+@login_required
 def route_download():
-   return redirect(url_for('home'))
-
-
-
-
-
-
-
-
+    set_current_url(scheme = 'http',
+                    server_addres=request.host ,
+                    path=request.path)
+    current_user = UniqueUser(db_folder=CONTENT_LOCATION , user_name=session.get('user'))
+    files = current_user.get_paid_content(ids_only=True)
+    files = current_user.classify_payed_cont(ids=files)
+    
+    files['GAMES'] =  [(db_indexer.get_content_name(i) ,i)for i in files['GAMES'] ]
+    files['MOVIES'] =  [(db_indexer.get_content_name(i) ,i)for i in files['MOVIES'] ]
+    
+    series_dict = {}
+    for series_name in files['SERIES']:
+        series_id = files['SERIES'][series_name]
+        series_dict[series_name] = [(db_indexer.get_content_name(i) , i) for i in series_id]
+        
+    files['SERIES'].update(series_dict)
+    print(files['SERIES'])
+    return render_template('watchlist.html', files=files)
 
 
 

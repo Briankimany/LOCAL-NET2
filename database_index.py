@@ -8,6 +8,7 @@ from config import CONTENT_LOCATION
 from utils import get_time , save_load_program_data
 from config import   DISPLAY_NO_IMAGE_CONTENT
 
+from PIL import Image
 
 
 
@@ -90,10 +91,10 @@ class DataBaseIndex:
 
         if NAME != "SERIES":
             series_query = f"SELECT content_id , item_name ,image_src FROM SERIES WHERE item_name = '{NAME}'"
+            series = list(cursor.execute("SELECT content_id , item_name , image_src FROM SERIES WHERE item_name = ?" , (NAME,)).fetchall())
         else:
             series_query = f"SELECT content_id , item_name ,image_src FROM SERIES"
-
-        series = list(cursor.execute(series_query).fetchall())
+            series = list(cursor.execute(series_query).fetchall())
 
         if all:
             series_copy= series
@@ -213,10 +214,11 @@ class DataBaseIndex:
         NAME = self.clean_name(series_name)
         cursor = sqlite3.connect(self.root_dir).cursor()
         if not str(series_name).isdigit() :
-            query = f"SELECT series_name FROM SERIES WHERE item_name = '{series_name}'"
+            # query = f"SELECT series_name FROM SERIES WHERE item_name = '{series_name}'"
+            name = cursor.execute("SELECT series_name FROM SERIES WHERE item_name =? " , (series_name,)).fetchone()
         else:
-          query =  f"SELECT series_name FROM SERIES WHERE content_id = {series_name}"
-        name = cursor.execute(query).fetchone()
+        #   query =  f"SELECT series_name FROM SERIES WHERE content_id = {series_name}"
+          name = cursor.execute("SELECT series_name FROM SERIES WHERE content_id =? " , (series_name,)).fetchone()
         if name :
             return  name[0]
         else:
@@ -335,7 +337,12 @@ class DataBaseIndex:
                         final_res.append((series_id , name , image_src))
 
         return final_res
-
+    
+    def get_check_out_image(self , content_id , size = (100 , 100)):
+        image_path = self.get_image_src(content_id=content_id)
+        image = Image.open(image_path)
+        image = image.resize(size)
+        return image
 
     def grab_no_profiles(self):
         db = sqlite3.connect(self.root_dir)
